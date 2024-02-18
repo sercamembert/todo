@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:todo/database/firestore.dart';
 import 'package:todo/widgets/my_button.dart';
@@ -19,7 +18,7 @@ class NewTaskPage extends StatelessWidget {
 
   final TextEditingController newPostController = TextEditingController();
 
-  String selectedCategory = ''; // zmienna przechowująca wybraną kategorię
+  String selectedCategory = '';
 
   void createTask(BuildContext context) {
     if (titleController.text.isEmpty) {
@@ -40,6 +39,8 @@ class NewTaskPage extends StatelessWidget {
       titleController.clear();
       dateController.clear();
       timeContoller.clear();
+
+      Navigator.of(context).pop();
     }
   }
 
