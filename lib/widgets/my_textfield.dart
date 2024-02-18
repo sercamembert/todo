@@ -17,7 +17,7 @@ class MyTextField extends StatelessWidget {
       children: [
         Text(
           hintText,
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
         ),
         const SizedBox(height: 3),
         TextField(
