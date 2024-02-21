@@ -107,6 +107,8 @@ class HomePage extends StatelessWidget {
                   );
                 },
               ),
+
+              //completed tasks
               const Text(
                 "Completed",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

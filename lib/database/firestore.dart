@@ -25,6 +25,26 @@ class FirestoreDatabase {
     });
   }
 
+  //update task
+  Future<void> updateTask(
+    String taskId,
+    String title,
+    String category,
+    String date,
+    String time,
+  ) async {
+    try {
+      await tasks.doc(taskId).update({
+        'Title': title,
+        'Category': category,
+        'Date': date,
+        'Time': time,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // read not completed tasks from database
   Stream<QuerySnapshot> getUncompletedTasksStream() {
     DateTime now = DateTime.now();
@@ -53,5 +73,15 @@ class FirestoreDatabase {
         .snapshots();
 
     return completedTasksStream;
+  }
+
+  // get task by id
+  Future<DocumentSnapshot> getTaskById(String taskId) async {
+    try {
+      DocumentSnapshot taskSnapshot = await tasks.doc(taskId).get();
+      return taskSnapshot;
+    } catch (error) {
+      throw error;
+    }
   }
 }

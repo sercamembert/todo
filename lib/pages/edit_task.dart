@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo/database/firestore.dart';
+import 'package:todo/providers/task_provider.dart';
 import 'package:todo/widgets/my_button.dart';
 import 'package:todo/widgets/my_categories.dart';
 import 'package:todo/widgets/my_data_textfield.dart';
@@ -8,19 +10,44 @@ import 'package:todo/widgets/my_time_textfield.dart';
 
 import '../helper/dissplay_message.dart';
 
-class NewTaskPage extends StatelessWidget {
-  NewTaskPage({Key? key});
+class EditTaskPage extends StatefulWidget {
+  EditTaskPage({Key? key}) : super(key: key);
+
+  @override
+  _EditTaskPageState createState() => _EditTaskPageState();
+}
+
+class _EditTaskPageState extends State<EditTaskPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController dateController = TextEditingController();
-  TextEditingController timeContoller = TextEditingController();
+  TextEditingController timeController = TextEditingController();
 
   final FirestoreDatabase database = FirestoreDatabase();
-
-  final TextEditingController newPostController = TextEditingController();
-
   String selectedCategory = '';
+  late String taskId;
 
-  void createTask(BuildContext context) {
+  @override
+  void initState() {
+    super.initState();
+    // Pobierz taskId z dostawcy
+    taskId = Provider.of<TaskProvider>(context, listen: false).taskId ?? '';
+    // Jeśli taskId nie jest pusty, pobierz zadanie z bazy danych
+    if (taskId.isNotEmpty) {
+      database.getTaskById(taskId).then((taskSnapshot) {
+        // Ustaw wartości kontrolerów na podstawie danych pobranych z bazy danych
+        setState(() {
+          titleController.text = taskSnapshot['Title'];
+          dateController.text = taskSnapshot['Date'];
+          timeController.text = taskSnapshot['Time'];
+          selectedCategory = taskSnapshot['Category'];
+        });
+      }).catchError((error) {
+        print("Błąd pobierania danych zadania: $error");
+      });
+    }
+  }
+
+  void updateTask(BuildContext context) {
     if (titleController.text.isEmpty) {
       displayMessageToUser("please enter title", context);
     } else if (selectedCategory.isEmpty) {
@@ -28,17 +55,18 @@ class NewTaskPage extends StatelessWidget {
     } else if (dateController.text.isEmpty) {
       displayMessageToUser("Please enter date", context);
     } else {
-      database.addTask(
+      database.updateTask(
+        taskId,
         titleController.text,
         selectedCategory,
         dateController.text,
-        timeContoller.text,
+        timeController.text,
       );
 
       selectedCategory = '';
       titleController.clear();
       dateController.clear();
-      timeContoller.clear();
+      timeController.clear();
 
       Navigator.of(context).pop();
     }
@@ -46,7 +74,9 @@ class NewTaskPage extends StatelessWidget {
 
   // Funkcja aktualizująca wybraną kategorię
   void updateSelectedCategory(String category) {
-    selectedCategory = category;
+    setState(() {
+      selectedCategory = category;
+    });
   }
 
   @override
@@ -107,7 +137,7 @@ class NewTaskPage extends StatelessWidget {
                 Expanded(
                   child: MyTimeTextField(
                     hintText: "Time",
-                    controller: timeContoller,
+                    controller: timeController,
                   ),
                 ),
               ],
@@ -115,7 +145,7 @@ class NewTaskPage extends StatelessWidget {
             const SizedBox(height: 35),
             MyButton(
               onTap: () {
-                createTask(context);
+                updateTask(context);
               },
               text: "Save",
             )

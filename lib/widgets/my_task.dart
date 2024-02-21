@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todo/widgets/my_task_category.dart';
+import 'package:provider/provider.dart';
+import '../providers/task_provider.dart';
 
 class MyTask extends StatelessWidget {
   MyTask({
@@ -58,6 +60,18 @@ class MyTask extends StatelessWidget {
                   ),
               ],
             ),
+          ),
+
+          // edit
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              Provider.of<TaskProvider>(context, listen: false).setTaskId(id);
+              Navigator.pushNamed(
+                context,
+                '/edit_task',
+              );
+            },
           ),
           // Checkbox
           Checkbox(
