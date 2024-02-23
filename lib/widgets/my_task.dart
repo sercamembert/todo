@@ -27,10 +27,14 @@ class MyTask extends StatelessWidget {
         .update({'IsDone': !isDone});
   }
 
+  void deleteTask() {
+    FirebaseFirestore.instance.collection('Tasks').doc(id).delete();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Opacity(
-      opacity: isDone ? 0.6 : 1.0, // Set opacity based on task completion
+      opacity: isDone ? 0.6 : 1.0,
       child: Row(
         children: [
           // Icon
@@ -42,7 +46,6 @@ class MyTask extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Apply TextDecoration.lineThrough if the task is done
                 Text(
                   title,
                   style: TextStyle(
@@ -62,6 +65,12 @@ class MyTask extends StatelessWidget {
             ),
           ),
 
+          //delete
+          IconButton(
+            icon: const Icon(Icons.delete_forever_rounded),
+            onPressed: deleteTask,
+          ),
+
           // edit
           IconButton(
             icon: const Icon(Icons.edit),
@@ -75,7 +84,7 @@ class MyTask extends StatelessWidget {
           ),
           // Checkbox
           Checkbox(
-            value: isDone, // You need to manage the state of the checkbox
+            value: isDone,
             onChanged: (bool? value) {
               changeTaskStatus(value);
             },
